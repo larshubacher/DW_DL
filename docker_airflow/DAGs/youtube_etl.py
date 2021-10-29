@@ -8,11 +8,11 @@ youtube = build("youtube", "v3", developerKey=api_key)
 number_of_videos = 50
 
 
-def get_video_list(youtube):
+def get_video_list(youtube, ti):
     video_list = []
-    #request = youtube.search().list(q=search_term, part="snippet", type="video", maxResults=50,
+    request = youtube.search().list(q=search_term, part="snippet", type="video", maxResults=50,
                                     order="date")  ## order --> Resources are sorted in reverse chronological order based on the date they were created
-    #response = request.execute()
+    response = request.execute()
 
     time.sleep(5)
 
@@ -24,12 +24,12 @@ def get_video_list(youtube):
             upload_date = video["snippet"]["publishedAt"]
 
         if len(video_list) < number_of_videos:
-            #request = youtube.search().list(q=search_term, part="snippet", type="video", maxResults=50,pageToken="nextPageToken")
+            request = youtube.search().list(q=search_term, part="snippet", type="video", maxResults=50,pageToken="nextPageToken")
         else:
             break
 
-
-    return video_list
+    ti.xcom_push(key="video_list", value=video_list)
+    #return video_list
 
 
 
@@ -37,16 +37,16 @@ def get_video_list(youtube):
 #print(video_list)
 #
 #
-def get_video_details(youtube, video_list):
+def get_video_details(youtube, video_list, ti):
 
     stats_list = []
-
+    video_list = ti.xcom_pull(key="video_list", task_ids="get_video_list")
     for i in range(0, len(video_list), 50):  ## range(start, end, steps)
-        #request = youtube.videos().list(
-            #part="snippet, contentDetails, statistics",
-            #id=video_list[i:i + 50])
+        request = youtube.videos().list(
+            part="snippet, contentDetails, statistics",
+            id=video_list[i:i + 50])
 
-        #data = request.execute()
+        data = request.execute()
 
         for video in data["items"]:
             title = video["snippet"]["title"]
@@ -64,10 +64,10 @@ def get_video_details(youtube, video_list):
                                     comment_count=comment_count)
 
             stats_list.append(stats_dictionary)
-        df = pd.DataFrame(stats_list)
-        #df.head()
 
-    return stats_list
+            json_string = json.dumps(stats_list)
+            print(json_string)
+    #return stats_list
 
 #video_data = get_video_details(youtube, video_list)
 #video_data
