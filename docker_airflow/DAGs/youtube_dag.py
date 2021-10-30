@@ -8,9 +8,10 @@ from datetime import timedelta
 
 from youtube_etl import get_video_list
 from youtube_etl import get_video_details
+from cred import api_key
 
 search_term = "Bitcoin"
-api_key = "AIzaSyCrbo3YbznPw7nFYpx6Ru3Y7k__ZzdgaGo"
+api_key = api_key
 youtube = build("youtube", "v3", developerKey=api_key)
 number_of_videos = 50
 
@@ -41,19 +42,21 @@ dag = DAG(
 #     print(json_string)
 
 
-with dag:
-    load_video_id = PythonOperator(
-        task_id = "get_video_list",
-        python_callable=get_video_list,
-        provide_context=True,
-        op_kwargs={'youtube': youtube}
-    )
+#with dag:
+get_video_list = PythonOperator(
+    task_id = "get_video_list",
+    python_callable=get_video_list,
+    provide_context=True,
+    op_kwargs={'youtube': youtube},
+    dag = dag
+)
 
-    get_video_details = PythonOperator(
-        task_id="get_video_details",
-        python_callable=get_video_details,
-        provide_context=True,
-        op_kwargs={'youtube': youtube}
-    )
+get_video_details = PythonOperator(
+    task_id="get_video_details",
+    python_callable=get_video_details,
+    provide_context=True,
+    op_kwargs={'youtube': youtube},
+    dag = dag
+)
 
-    load_video_id >> get_video_details
+get_video_list >> get_video_details
