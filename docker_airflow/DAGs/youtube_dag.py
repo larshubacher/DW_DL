@@ -10,6 +10,7 @@ from youtube_etl import get_video_list
 from youtube_etl import get_video_details
 from cred import api_key
 
+
 search_term = "Bitcoin"
 api_key = api_key
 youtube = build("youtube", "v3", developerKey=api_key)
@@ -27,19 +28,9 @@ dag = DAG(
     dag_id="youtube_dag",
     default_args=default_args,
     description="First DAG with ETL process",
-    schedule_interval = timedelta(days=1)
+    schedule_interval = "@daily"
 )
 
-
-# def get_video_list(ti):
-#     video_list = [1, 2, 3, 4]
-#     print(video_list)
-#     ti.xcom_push(key="video_list", value=video_list)
-#
-# def get_video_details():
-#     video_list = ti.xcom_pull(key="video_list", task_ids="get_video_list")
-#     json_string = json.dumps(stats_list)
-#     print(json_string)
 
 
 #with dag:
@@ -47,7 +38,6 @@ get_video_list = PythonOperator(
     task_id = "get_video_list",
     python_callable=get_video_list,
     provide_context=True,
-    op_kwargs={'youtube': youtube},
     dag = dag
 )
 
@@ -55,7 +45,6 @@ get_video_details = PythonOperator(
     task_id="get_video_details",
     python_callable=get_video_details,
     provide_context=True,
-    op_kwargs={'youtube': youtube},
     dag = dag
 )
 

@@ -1,14 +1,16 @@
 from googleapiclient.discovery import build
 import pandas as pd
 import time
+from cred import api_key
 
-#search_term = "Bitcoin"
-#api_key = "AIzaSyCrbo3YbznPw7nFYpx6Ru3Y7k__ZzdgaGo"
-#youtube = build("youtube", "v3", developerKey=api_key)
-#number_of_videos = 50
+search_term = "Bitcoin"
+api_key = api_key
+youtube = build("youtube", "v3", developerKey=api_key)
+number_of_videos = 50
 
 
-def get_video_list(youtube):
+def get_video_list(youtube, ti):
+
     video_list = []
     request = youtube.search().list(q=search_term, part="snippet", type="video", maxResults=50,
                                     order="date")  ## order --> Resources are sorted in reverse chronological order based on the date they were created
@@ -38,6 +40,7 @@ def get_video_list(youtube):
 #
 #
 def get_video_details(youtube, video_list, ti):
+
 
     stats_list = []
     video_list = ti.xcom_pull(key="video_list", task_ids="get_video_list")
