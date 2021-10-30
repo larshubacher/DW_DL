@@ -37,8 +37,7 @@ def get_video_list(youtube, ti):
 
 #video_list = get_video_list(youtube)
 #print(video_list)
-#
-#
+
 def get_video_details(youtube, video_list, ti):
 
 
